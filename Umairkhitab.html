@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Umair Khitab - Data Science Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #475569;
+        }
+        .section-title {
+            @apply text-3xl font-bold text-slate-800 mb-8 text-center;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #2563eb;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        .bar:hover {
+            fill: #1d4ed8;
+            cursor: pointer;
+        }
+        .node {
+            cursor: pointer;
+            stroke: #fff;
+            stroke-width: 1.5px;
+        }
+        .link {
+            stroke: #9ca3af;
+            stroke-opacity: 0.6;
+            stroke-width: 2px;
+        }
+        .tooltip {
+            position: absolute;
+            text-align: center;
+            padding: 8px;
+            font: 12px sans-serif;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            pointer-events: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="text-slate-700">
+
+    <header id="header" class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-xl font-bold text-slate-800">Umair Khitab</a>
+            <div class="hidden md:flex space-x-6 items-center">
+                <a href="#about" class="hover:text-blue-600 transition-colors">About</a>
+                <a href="#skills" class="hover:text-blue-600 transition-colors">Skills</a>
+                <a href="#publications" class="hover:text-blue-600 transition-colors">Publications</a>
+                <a href="#certifications" class="hover:text-blue-600 transition-colors">Certifications</a>
+                <a href="#gemini-project" class="hover:text-blue-600 transition-colors">Project Generator</a>
+                <a href="#education" class="hover:text-blue-600 transition-colors">Education</a>
+            </div>
+            <button id="mobile-menu-btn" class="md:hidden p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden bg-white">
+            <a href="#about" class="block text-center py-2 px-4 text-sm hover:bg-slate-100">About</a>
+            <a href="#skills" class="block text-center py-2 px-4 text-sm hover:bg-slate-100">Skills</a>
+            <a href="#publications" class="block text-center py-2 px-4 text-sm hover:bg-slate-100">Publications</a>
+            <a href="#certifications" class="block text-center py-2 px-4 text-sm hover:bg-slate-100">Certifications</a>
+            <a href="#gemini-project" class="block text-center py-2 px-4 text-sm hover:bg-slate-100">Project Generator</a>
+            <a href="#education" class="block text-center py-2 px-4 text-sm hover:bg-slate-100">Education</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero" class="relative py-24 md:py-32 bg-slate-900 text-white overflow-hidden">
+            <canvas id="hero-canvas" class="absolute inset-0 w-full h-full opacity-30"></canvas>
+            <div class="relative z-10 container mx-auto px-6 text-center">
+                <h1 class="text-4xl md:text-6xl font-extrabold leading-tight">Umair Khitab</h1>
+                <p class="mt-4 text-lg md:text-xl text-blue-400 font-medium">Aspiring Data Scientist & Innovator</p>
+                <div class="mt-8 flex justify-center items-center space-x-5">
+                    <a href="https://www.linkedin.com/in/umair-khitab-398a492a5" target="_blank" rel="noopener noreferrer" class="text-slate-300 hover:text-blue-400 transition-colors">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" clip-rule="evenodd"/></svg>
+                    </a>
+                    <a href="https://github.com/Umair-khitab" target="_blank" rel="noopener noreferrer" class="text-slate-300 hover:text-blue-400 transition-colors">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.168 6.839 9.49.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.03-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.338 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.001 10.001 0 0022 12c0-5.523-4.477-10-10-10z" clip-rule="evenodd"/></svg>
+                    </a>
+                    <a href="mailto:khitabumair237@gmail.com" class="text-slate-300 hover:text-blue-400 transition-colors">
+                        <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"><path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0l-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z"/></svg>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="section-title">About Me</h2>
+                <div class="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md">
+                     <p class="text-lg text-center leading-relaxed">
+                        A passionate and proactive Data Science student in my 4th semester, with a strong foundation in data analysis, machine learning, and problem-solving. Eager to leverage a natural curiosity for turning complex puzzles into actionable insights. Committed to continuous learning and contributing innovative solutions in a dynamic team environment.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="skill-progression" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <h2 class="section-title">My Skill Progression</h2>
+                <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md">
+                    <p class="text-center text-lg text-slate-600 mb-8">
+                        This chart visualizes my current progression and growing proficiency in core data science skills. Hover over the bars for more details.
+                    </p>
+                    <div id="d3-bar-chart-container" class="w-full flex justify-center">
+                        <!-- D3.js chart will be rendered here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="skills" class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="section-title">My Skillset</h2>
+                <div class="grid md:grid-cols-2 gap-10 max-w-4xl mx-auto">
+                    <div class="bg-slate-50 p-8 rounded-lg shadow-sm">
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4 text-center">Technical Skills</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-start"><span class="font-bold text-blue-600 mr-2 w-48 shrink-0">Programming:</span><span>Python, C++</span></li>
+                            <li class="flex items-start"><span class="font-bold text-blue-600 mr-2 w-48 shrink-0">Analysis & Visualization:</span><span>Rapid Miner, Excel</span></li>
+                            <li class="flex items-start"><span class="font-bold text-blue-600 mr-2 w-48 shrink-0">Tools & Platforms:</span><span>Jupyter Notebooks, Git, GitHub</span></li>
+                            <li class="flex items-start"><span class="font-bold text-blue-600 mr-2 w-48 shrink-0">Developing in ML:</span><span class="text-slate-500 italic">Actively learning core concepts</span></li>
+                            <li class="flex items-start"><span class="font-bold text-blue-600 mr-2 w-48 shrink-0">Developing in Databases:</span><span class="text-slate-500 italic">Expanding knowledge in SQL</span></li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-50 p-8 rounded-lg shadow-sm">
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4 text-center">Soft Skills</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-center"><span class="text-blue-500 mr-3">✔</span> Problem-Solving</li>
+                            <li class="flex items-center"><span class="text-blue-500 mr-3">✔</span> Critical Thinking</li>
+                            <li class="flex items-center"><span class="text-blue-500 mr-3">✔</span> Analytical Reasoning</li>
+                            <li class="flex items-center"><span class="text-blue-500 mr-3">✔</span> Collaboration & Teamwork</li>
+                            <li class="flex items-center"><span class="text-blue-500 mr-3">✔</span> Communication</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="force-graph" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <h2 class="section-title">Interactive Skill Relationships</h2>
+                <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md">
+                    <p class="text-center text-lg text-slate-600 mb-6">
+                        Explore the relationships between my technical skills in this interactive force-directed graph.
+                    </p>
+                    <div id="d3-force-graph-container" class="w-full flex justify-center">
+                        <!-- D3.js force graph will be rendered here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="interactive-showcase" class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="section-title">Interactive Showcase: Data Distribution</h2>
+                <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md">
+                    <p class="text-center text-lg text-slate-600 mb-6">
+                        This scatter plot shows a random distribution of data points. Click the button to generate a new set of data!
+                    </p>
+                    <div id="d3-scatter-plot-container" class="w-full flex justify-center">
+                        <!-- D3.js scatter plot will be rendered here -->
+                    </div>
+                    <div class="mt-6 text-center">
+                        <button id="refresh-scatter-data" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400">
+                            Refresh Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="gemini-project" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <h2 class="section-title">✨ AI-Powered Project Idea Generator ✨</h2>
+                <div class="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md">
+                    <p class="text-center text-lg text-slate-600 mb-6">
+                        Enter a topic below and let a powerful language model generate a unique data science project idea for you.
+                    </p>
+                    <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
+                        <textarea id="prompt-input" rows="3" class="w-full md:w-2/3 p-4 rounded-lg border-2 border-slate-200 focus:outline-none focus:border-blue-500 resize-none" placeholder="e.g., 'analyzing social media trends' or 'predicting stock prices'"></textarea>
+                        <button id="generate-btn" class="w-full md:w-1/3 bg-blue-600 text-white font-bold py-4 rounded-lg shadow-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400">
+                            Generate Idea
+                        </button>
+                    </div>
+                    <div id="loading-spinner" class="hidden mt-8 text-center">
+                        <div class="spinner mx-auto"></div>
+                        <p class="mt-2 text-slate-500">Generating your project idea...</p>
+                    </div>
+                    <div id="result-container" class="mt-8 p-6 bg-slate-50 rounded-lg hidden">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-slate-800">Generated Project Idea</h3>
+                            <button id="copy-btn" class="text-sm text-blue-600 font-semibold py-1 px-3 bg-blue-100 rounded-full hover:bg-blue-200 transition-colors">Copy</button>
+                        </div>
+                        <div id="copy-message" class="hidden text-sm text-green-600 text-center mb-2">Copied to clipboard!</div>
+                        <div id="project-idea-content" class="prose max-w-none text-slate-700"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="publications" class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="section-title">Publications & Projects</h2>
+                <div class="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md">
+                    <ul class="space-y-6">
+                        <li class="p-4 border-l-4 border-blue-500 bg-slate-50 rounded-lg shadow-sm">
+                            <h3 class="text-lg font-bold text-slate-800">Predictive Model for Customer Churn in Telecommunications</h3>
+                            <p class="text-sm text-slate-600 mt-1">A machine learning project focusing on customer behavior analysis and model deployment. **Key Outcome:** Improved prediction accuracy by 15% using a Gradient Boosting model.</p>
+                        </li>
+                        <li class="p-4 border-l-4 border-blue-500 bg-slate-50 rounded-lg shadow-sm">
+                            <h3 class="text-lg font-bold text-slate-800">Exploring the Impact of Social Media on E-commerce Sales</h3>
+                            <p class="text-sm text-slate-600 mt-1">An analytical report using sentiment analysis and time-series data to identify correlations. **Key Outcome:** Found a strong positive correlation between positive social media mentions and daily sales volume.</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="certifications" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <h2 class="section-title">Certifications</h2>
+                <div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
+                    <div class="space-y-4">
+                        <a href="https://www.credly.com/users/umair-khitab/badges" target="_blank" rel="noopener noreferrer" class="block p-4 border border-slate-200 rounded-md hover:bg-slate-50 hover:shadow-lg transition-all transform hover:-translate-y-1">
+                            <h4 class="font-bold text-blue-600">C++</h4>
+                            <p class="text-sm text-slate-500">View on Credly</p>
+                        </a>
+                        <a href="https://www.credly.com/users/umair-khitab/badges" target="_blank" rel="noopener noreferrer" class="block p-4 border border-slate-200 rounded-md hover:bg-slate-50 hover:shadow-lg transition-all transform hover:-translate-y-1">
+                            <h4 class="font-bold text-blue-600">Python</h4>
+                            <p class="text-sm text-slate-500">View on Credly</p>
+                        </a>
+                        <a href="https://www.credly.com/users/umair-khitab/badges" target="_blank" rel="noopener noreferrer" class="block p-4 border border-slate-200 rounded-md hover:bg-slate-50 hover:shadow-lg transition-all transform hover:-translate-y-1">
+                            <h4 class="font-bold text-blue-600">Introduction to Data Science</h4>
+                            <p class="text-sm text-slate-500">View on Credly</p>
+                        </a>
+                         <a href="https://www.credly.com/users/umair-khitab/badges" target="_blank" rel="noopener noreferrer" class="block p-4 border border-slate-200 rounded-md hover:bg-slate-50 hover:shadow-lg transition-all transform hover:-translate-y-1">
+                            <h4 class="font-bold text-blue-600">Communication and Technology</h4>
+                            <p class="text-sm text-slate-500">View on Credly</p>
+                        </a>
+                         <a href="https://www.credly.com/users/umair-khitab/badges" target="_blank" rel="noopener noreferrer" class="block p-4 border border-slate-200 rounded-md hover:bg-slate-50 hover:shadow-lg transition-all transform hover:-translate-y-1">
+                            <h4 class="font-bold text-blue-600">Data Analysis</h4>
+                            <p class="text-sm text-slate-500">View on Credly</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="education" class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="section-title">Education</h2>
+                <div class="max-w-2xl mx-auto text-center">
+                    <div class="bg-slate-50 p-8 rounded-lg shadow-sm inline-block">
+                        <h3 class="text-xl font-bold text-slate-800">Bachelor of Science in Data Science</h3>
+                        <p class="mt-1 text-slate-600">Riphah International University, Islamabad</p>
+                        <p class="mt-2 text-sm text-blue-600 font-semibold bg-blue-100 px-3 py-1 rounded-full inline-block">Expected Graduation: Spring 2027</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-800 text-white py-10">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2025 Umair Khitab. All Rights Reserved.</p>
+            <p class="mt-2 text-sm text-slate-400">Feel free to reach out: <a href="mailto:khitabumair237@gmail.com" class="underline hover:text-blue-400">khitabumair237@gmail.com</a></p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Mobile menu functionality
+            const header = document.getElementById('header');
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            const navLinks = document.querySelectorAll('a[href^="#"]');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    let targetId = this.getAttribute('href');
+                    let targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        if (!mobileMenu.classList.contains('hidden')) {
+                            mobileMenu.classList.add('hidden');
+                        }
+                        let offset = header.offsetHeight;
+                        let targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - offset;
+                        window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+                    }
+                });
+            });
+
+            // Gemini API Project Idea Generator functionality
+            const promptInput = document.getElementById('prompt-input');
+            const generateBtn = document.getElementById('generate-btn');
+            const loadingSpinner = document.getElementById('loading-spinner');
+            const resultContainer = document.getElementById('result-container');
+            const projectIdeaContent = document.getElementById('project-idea-content');
+            const copyBtn = document.getElementById('copy-btn');
+            const copyMessage = document.getElementById('copy-message');
+
+            generateBtn.addEventListener('click', async () => {
+                const userPrompt = promptInput.value.trim();
+                if (!userPrompt) return;
+                loadingSpinner.classList.remove('hidden');
+                resultContainer.classList.add('hidden');
+                projectIdeaContent.innerHTML = '';
+                generateBtn.disabled = true;
+                copyBtn.disabled = true;
+
+                try {
+                    const systemPrompt = "Act as a data science mentor. Provide a unique, creative, and challenging data science project idea for a 4th-semester student based on the following topic. The response should include the project name, the problem statement, and a list of key technologies to use. Format your response using markdown with bold headings and lists.";
+                    const apiKey = "";
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                    
+                    const payload = {
+                        contents: [{ parts: [{ text: userPrompt }] }],
+                        systemInstruction: { parts: [{ text: systemPrompt }] },
+                    };
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) throw new Error(`API call failed with status: ${response.status}`);
+                    const result = await response.json();
+                    const generatedText = result?.candidates?.[0]?.content?.parts?.[0]?.text || "No idea could be generated at this time. Please try again with a different topic.";
+                    const formattedHtml = generatedText
+                        .replace(/\*\*(.*?)\*\*/g, '<h3>$1</h3>')
+                        .replace(/^- (.*)/gm, '<li class="ml-4">$1</li>')
+                        .replace(/^-/gm, '')
+                        .replace(/\n\n/g, '<br><br>');
+                    projectIdeaContent.innerHTML = formattedHtml;
+                    resultContainer.classList.remove('hidden');
+                    copyBtn.disabled = false;
+
+                } catch (error) {
+                    projectIdeaContent.innerHTML = `<p class="text-red-500">An error occurred: ${error.message}. Please try again later.</p>`;
+                    resultContainer.classList.remove('hidden');
+                } finally {
+                    loadingSpinner.classList.add('hidden');
+                    generateBtn.disabled = false;
+                }
+            });
+
+            copyBtn.addEventListener('click', () => {
+                const textToCopy = projectIdeaContent.innerText;
+                if (textToCopy) {
+                    navigator.clipboard.writeText(textToCopy).then(() => {
+                        copyMessage.classList.remove('hidden');
+                        setTimeout(() => {
+                            copyMessage.classList.add('hidden');
+                        }, 2000);
+                    }).catch(err => {
+                        console.error('Failed to copy text: ', err);
+                    });
+                }
+            });
+
+
+            // D3.js Bar Chart
+            function createBarChart() {
+                const data = [
+                    { skill: 'Python', proficiency: 80 },
+                    { skill: 'Data Analysis', proficiency: 75 },
+                    { skill: 'Machine Learning', proficiency: 50 },
+                    { skill: 'SQL', proficiency: 60 },
+                    { skill: 'Data Visualization', proficiency: 70 }
+                ];
+                
+                const container = d3.select("#d3-bar-chart-container");
+                container.select("svg").remove(); // Clear existing chart
+                const margin = { top: 20, right: 30, bottom: 40, left: 100 };
+                const containerWidth = container.node().getBoundingClientRect().width;
+                const width = containerWidth - margin.left - margin.right;
+                const height = 300 - margin.top - margin.bottom;
+
+                const svg = container.append("svg")
+                    .attr("viewBox", `0 0 ${containerWidth} ${300}`)
+                    .attr("width", "100%")
+                    .attr("height", "300")
+                    .append("g")
+                    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+                const x = d3.scaleLinear().domain([0, 100]).range([0, width]);
+                const y = d3.scaleBand().domain(data.map(d => d.skill)).range([0, height]).padding(0.2);
+
+                svg.append("g").attr("class", "x-axis").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x).ticks(5).tickSizeOuter(0));
+                svg.append("g").attr("class", "y-axis").call(d3.axisLeft(y).tickSizeOuter(0));
+
+                svg.selectAll(".bar")
+                    .data(data)
+                    .enter().append("rect")
+                    .attr("class", "bar")
+                    .attr("x", 0)
+                    .attr("y", d => y(d.skill))
+                    .attr("width", d => x(d.proficiency))
+                    .attr("height", y.bandwidth())
+                    .attr("fill", "#2563eb")
+                    .attr("rx", 5).attr("ry", 5);
+
+                svg.selectAll(".bar-label")
+                    .data(data)
+                    .enter().append("text")
+                    .attr("class", "bar-label")
+                    .attr("x", d => x(d.proficiency) + 5)
+                    .attr("y", d => y(d.skill) + y.bandwidth() / 2)
+                    .attr("dy", "0.35em")
+                    .text(d => `${d.proficiency}%`)
+                    .attr("fill", "rgb(71, 85, 105)");
+            }
+
+            // D3.js Scatter Plot
+            function createScatterPlot() {
+                const container = d3.select("#d3-scatter-plot-container");
+                const margin = { top: 20, right: 20, bottom: 40, left: 50 };
+                const containerWidth = container.node().getBoundingClientRect().width;
+                const width = containerWidth - margin.left - margin.right;
+                const height = 300 - margin.top - margin.bottom;
+
+                container.select("svg").remove();
+                
+                const svg = container.append("svg")
+                    .attr("viewBox", `0 0 ${containerWidth} ${300}`)
+                    .attr("width", "100%")
+                    .attr("height", "300")
+                    .append("g")
+                    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+                const x = d3.scaleLinear().domain([0, 100]).range([0, width]);
+                const y = d3.scaleLinear().domain([0, 100]).range([height, 0]);
+
+                svg.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x));
+                svg.append("g").call(d3.axisLeft(y));
+
+                svg.append("text")
+                    .attr("transform", "rotate(-90)")
+                    .attr("y", -margin.left)
+                    .attr("x", - (height / 2))
+                    .attr("dy", "1em")
+                    .style("text-anchor", "middle")
+                    .style("font-size", "14px")
+                    .text("Y-Axis Value");
+
+                svg.append("text")
+                    .attr("transform", `translate(${width / 2}, ${height + margin.bottom - 5})`)
+                    .style("text-anchor", "middle")
+                    .style("font-size", "14px")
+                    .text("X-Axis Value");
+
+                function generateData() {
+                    return d3.range(50).map(() => ({
+                        x: Math.random() * 100,
+                        y: Math.random() * 100
+                    }));
+                }
+
+                function updateChart(data) {
+                    const circles = svg.selectAll("circle").data(data, d => d.x + d.y);
+                    
+                    circles.enter().append("circle")
+                        .attr("cx", d => x(d.x))
+                        .attr("cy", d => y(d.y))
+                        .attr("r", 5)
+                        .attr("fill", "#3b82f6")
+                        .attr("opacity", 0.7)
+                        .merge(circles)
+                        .transition()
+                        .duration(1000)
+                        .attr("cx", d => x(d.x))
+                        .attr("cy", d => y(d.y));
+
+                    circles.exit()
+                        .transition()
+                        .duration(500)
+                        .attr("r", 0)
+                        .remove();
+                }
+
+                document.getElementById("refresh-scatter-data").addEventListener("click", () => {
+                    updateChart(generateData());
+                });
+
+                updateChart(generateData());
+            }
+
+            // D3.js Force-Directed Graph
+            function createForceGraph() {
+                const container = d3.select("#d3-force-graph-container");
+                container.select("svg").remove();
+                
+                const containerWidth = container.node().getBoundingClientRect().width;
+                const width = containerWidth;
+                const height = 400;
+
+                const data = {
+                    nodes: [
+                        { id: "Python", group: 1 },
+                        { id: "Data Analysis", group: 2 },
+                        { id: "Machine Learning", group: 3 },
+                        { id: "SQL", group: 2 },
+                        { id: "Pandas", group: 1 },
+                        { id: "Numpy", group: 1 },
+                        { id: "Scikit-learn", group: 3 },
+                        { id: "Matplotlib", group: 2 },
+                        { id: "TensorFlow", group: 3 }
+                    ],
+                    links: [
+                        { source: "Python", target: "Pandas", value: 10 },
+                        { source: "Python", target: "Numpy", value: 8 },
+                        { source: "Python", target: "Data Analysis", value: 7 },
+                        { source: "Python", target: "Machine Learning", value: 9 },
+                        { source: "Python", target: "Matplotlib", value: 6 },
+                        { source: "Pandas", target: "Numpy", value: 5 },
+                        { source: "Pandas", target: "Data Analysis", value: 10 },
+                        { source: "Numpy", target: "Data Analysis", value: 9 },
+                        { source: "Data Analysis", target: "SQL", value: 8 },
+                        { source: "Machine Learning", target: "Scikit-learn", value: 10 },
+                        { source: "Machine Learning", target: "TensorFlow", value: 9 }
+                    ]
+                };
+
+                const svg = container.append("svg")
+                    .attr("viewBox", `0 0 ${width} ${height}`)
+                    .attr("width", "100%")
+                    .attr("height", height);
+
+                const simulation = d3.forceSimulation(data.nodes)
+                    .force("link", d3.forceLink(data.links).id(d => d.id).distance(100))
+                    .force("charge", d3.forceManyBody().strength(-200))
+                    .force("center", d3.forceCenter(width / 2, height / 2));
+
+                const link = svg.append("g")
+                    .attr("stroke", "#999")
+                    .attr("stroke-opacity", 0.6)
+                    .selectAll("line")
+                    .data(data.links)
+                    .join("line")
+                    .attr("stroke-width", d => Math.sqrt(d.value));
+
+                const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+                const node = svg.append("g")
+                    .attr("stroke", "#fff")
+                    .attr("stroke-width", 1.5)
+                    .selectAll("circle")
+                    .data(data.nodes)
+                    .join("circle")
+                    .attr("r", 10)
+                    .attr("fill", d => color(d.group))
+                    .call(drag(simulation));
+
+                const label = svg.append("g")
+                    .selectAll("text")
+                    .data(data.nodes)
+                    .join("text")
+                    .attr("x", 12)
+                    .attr("y", "0.31em")
+                    .text(d => d.id)
+                    .style("font-size", "12px")
+                    .style("fill", "#333")
+                    .style("pointer-events", "none");
+
+                node.append("title")
+                    .text(d => d.id);
+
+                simulation.on("tick", () => {
+                    link
+                        .attr("x1", d => d.source.x)
+                        .attr("y1", d => d.source.y)
+                        .attr("x2", d => d.target.x)
+                        .attr("y2", d => d.target.y);
+
+                    node
+                        .attr("cx", d => d.x)
+                        .attr("cy", d => d.y);
+                    
+                    label
+                        .attr("x", d => d.x + 15)
+                        .attr("y", d => d.y);
+                });
+
+                function drag(simulation) {
+                    function dragstarted(event, d) {
+                        if (!event.active) simulation.alphaTarget(0.3).restart();
+                        d.fx = d.x;
+                        d.fy = d.y;
+                    }
+                    function dragged(event, d) {
+                        d.fx = event.x;
+                        d.fy = event.y;
+                    }
+                    function dragended(event, d) {
+                        if (!event.active) simulation.alphaTarget(0);
+                        d.fx = null;
+                        d.fy = null;
+                    }
+                    return d3.drag()
+                        .on("start", dragstarted)
+                        .on("drag", dragged)
+                        .on("end", dragended);
+                }
+            }
+            
+            // Hero Section Canvas Animation
+            const canvas = document.getElementById('hero-canvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            const particleCount = 75;
+            let animationFrameId;
+
+            function initCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = canvas.parentElement.offsetHeight;
+                particles = [];
+                for (let i = 0; i < particleCount; i++) {
+                    particles.push(new Particle());
+                }
+            }
+
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 2 + 1;
+                    this.speedX = Math.random() * 0.5 - 0.25;
+                    this.speedY = Math.random() * 0.5 - 0.25;
+                    this.color = `rgba(255, 255, 255, ${Math.random() * 0.5 + 0.2})`;
+                }
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    if (this.x < 0 || this.x > canvas.width) this.speedX = -this.speedX;
+                    if (this.y < 0 || this.y > canvas.height) this.speedY = -this.speedY;
+                }
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                }
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+                    // Link nearby particles
+                    for (let j = i; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        if (distance < 100) {
+                            ctx.beginPath();
+                            ctx.strokeStyle = `rgba(255, 255, 255, ${1 - distance / 100})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+                animationFrameId = requestAnimationFrame(animate);
+            }
+            
+            initCanvas();
+            animate();
+
+            window.addEventListener('resize', () => {
+                cancelAnimationFrame(animationFrameId);
+                initCanvas();
+                animate();
+                createBarChart();
+                createScatterPlot();
+                createForceGraph();
+            });
+
+            // Initial chart creation
+            createBarChart();
+            createScatterPlot();
+            createForceGraph();
+        });
+    </script>
+</body>
+</html>
